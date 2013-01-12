@@ -77,6 +77,11 @@
 #include <linux/mfd/pm8xxx/pm8xxx-vibrator-pwm.h>
 #include <mach/htc_ramdump.h>
 
+#ifdef CONFIG_PERFLOCK
+#include <mach/perflock.h>
+#endif
+
+
 #ifdef CONFIG_BT
 #include <mach/msm_serial_hs.h>
 #include <mach/htc_bdaddress.h>
@@ -3156,7 +3161,7 @@ static struct platform_device msm_tsens_device = {
 static struct msm_thermal_data msm_thermal_pdata = {
 	.sensor_id = 0,
 	.poll_ms = 1000,
-	.limit_temp = 75,
+	.limit_temp = 55,
 	.temp_hysteresis = 10,
 	.limit_freq = 918000,
 };
@@ -3293,13 +3298,13 @@ static struct msm_rpmrs_platform_data msm_rpmrs_data __initdata = {
 		[MSM_RPMRS_VDD_MEM_RET_LOW]	= 750000,
 		[MSM_RPMRS_VDD_MEM_RET_HIGH]	= 750000,
 		[MSM_RPMRS_VDD_MEM_ACTIVE]	= 1050000,
-		[MSM_RPMRS_VDD_MEM_MAX]		= 1250000,
+		[MSM_RPMRS_VDD_MEM_MAX]		= 1150000,
 	},
 	.vdd_dig_levels = {
 		[MSM_RPMRS_VDD_DIG_RET_LOW]	= 500000,
 		[MSM_RPMRS_VDD_DIG_RET_HIGH]	= 750000,
 		[MSM_RPMRS_VDD_DIG_ACTIVE]	= 950000,
-		[MSM_RPMRS_VDD_DIG_MAX]		= 1250000,
+		[MSM_RPMRS_VDD_DIG_MAX]		= 1150000,
 	},
 	.vdd_mask = 0x7FFFFF,
 	.rpmrs_target_id = {
@@ -3505,6 +3510,40 @@ static struct msm_spm_seq_entry msm_spm_seq_list[] __initdata = {
 		.cmd = spm_power_collapse_with_rpm,
 	},
 };
+
+#ifdef CONFIG_PERFLOCK
+static unsigned dlx_perf_acpu_table[] = {
+	594000000, /* LOWEST */
+	810000000, /* LOW */
+	1026000000, /* MEDIUM */
+	1134000000,/* HIGH */
+	1512000000, /* HIGHEST */
+};
+
+static struct perflock_data dlx_floor_data = {
+	.perf_acpu_table = dlx_perf_acpu_table,
+	.table_size = ARRAY_SIZE(dlx_perf_acpu_table),
+};
+
+static struct perflock_data dlx_cpufreq_ceiling_data = {
+	.perf_acpu_table = dlx_perf_acpu_table,
+	.table_size = ARRAY_SIZE(dlx_perf_acpu_table),
+};
+
+static struct perflock_pdata perflock_pdata = {
+	.perf_floor = &dlx_floor_data,
+	.perf_ceiling = &dlx_cpufreq_ceiling_data,
+};
+
+struct platform_device msm8064_device_perf_lock = {
+	.name = "perf_lock",
+	.id = -1,
+	.dev = {
+		.platform_data = &perflock_pdata,
+	},
+};
+
+#endif
 
 static uint8_t l2_spm_wfi_cmd_sequence[] __initdata = {
 	0x00, 0x20, 0x03, 0x20,
@@ -4108,6 +4147,9 @@ static struct platform_device *common_devices[] __initdata = {
 	&apq8064_iommu_domain_device,
 #ifdef CONFIG_MSM_CACHE_ERP
 	&apq8064_device_cache_erp,
+#endif
+#ifdef CONFIG_PERFLOCK
+	&msm8064_device_perf_lock,
 #endif
 /* HTC_AUD_START LPA5 */
 	&apq_compr_dsp,

@@ -1646,12 +1646,12 @@ config MSM_CPU_FREQ_SET_MIN_MAX
 config MSM_CPU_FREQ_MAX
 	int "Max CPU Frequency"
 	depends on MSM_CPU_FREQ_SET_MIN_MAX
-	default 1512000
+	default 384000
 
 config MSM_CPU_FREQ_MIN
 	int "Min CPU Frequency"
 	depends on MSM_CPU_FREQ_SET_MIN_MAX
-	default 192000
+	default 245760
 
 endif # CPU_FREQ_MSM
 
@@ -2600,24 +2600,6 @@ config MACH_DELUXE_UL
         bool "APQ8064 DELUXE_UL"
         help
           Support for the HTC APQ8064 DELUXE_UL.
-
-config MACH_IMPRESSION_J
-        depends on ARCH_APQ8064
-        bool "APQ8064 IMPRESSION_J"
-        help
-          Support for the HTC APQ8064 IMPRESSION_J.
-
-config MACH_M7
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7"
-        help
-          Support for the HTC APQ8064 M7.
-
-config MACH_VILLEC2
-        depends on ARCH_MSM8X60
-        bool "VILLEC2"
-        help
-          Support for the HTC VILLEC2 device.
 
 config HTC_HEADSET_ONE_WIRE
 	tristate "HTC 1-wire headset detection driver"
